@@ -1,9 +1,11 @@
 import csv
 
+#usage: python combo.py a.csv b.csv o.csv
 
-a = 'a.csv' #first filename
-b = 'b.csv' #second filename
-o = 'o.csv' #output file
+import sys
+a = sys.argv[1]
+b = sys.argv[2]
+o = sys.argv[3]
 
 table = {}
 header = None
@@ -30,7 +32,6 @@ with open(b) as csvfileb:
         table[row[0].strip()] = grades
 
 gradeheader = header[firstcol:lastcol]
-print table.keys()
 
 with open(a) as csvfilea:
     with open(o, 'w') as csvfileo:
@@ -43,11 +44,13 @@ with open(a) as csvfilea:
         csvo.writerow(temp)
 
         #write second row without changing
-        csvo.writerow(csva.next())
+        temp = csva.next()
+        for i in xrange(len(gradeheader)):
+            temp.extend('')
+        csvo.writerow(temp)
 
         #append rows
         for row in csva:
-            print row[2]
             if row[2] in table:
                 row.extend(table[row[2]])
                 csvo.writerow(row)
