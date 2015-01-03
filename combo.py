@@ -1,45 +1,62 @@
 import csv
 
 
-a = '1.csv' #first filename
-b = '2.csv' #second filename
-o = '3.csv' #output file
+a = 'a.csv' #first filename
+b = 'b.csv' #second filename
+o = 'o.csv' #output file
 
-c = 'column1'
-idxc = 0 #column index of c
-d = 'column2'
-idxd = 0 #column index of d
-
-cprime = 'column1'
-dprime = 'column2'
-
-table = {} #initialize mapping
+table = {}
+header = None
+firstcol = 0
+lastcol = 0
 
 with open(b) as csvfileb:
-    csvb = csv.DictReader(csvfileb)
+    csvfileb.readline()
 
-    #next, put all c' -> d' mappings into the table
-    for row in csvb:
-        table[row[cprime]] = row[dprime]
+    csvb = csv.reader(csvfileb)
+    firstcol = 6
+    lastcol = firstcol
+    header = [i.strip() for i in csvb.next()]
+    while header[lastcol] != 'summary':
+        lastcol += 1
+
+    for i in xrange(5): #skip header
+        csvb.next()
+
+    for row in csvb: #create table list
+        grades = []
+        for i in xrange(firstcol, lastcol):
+            grades.append(row[i])
+        table[row[0].strip()] = grades
+
+gradeheader = header[firstcol:lastcol]
+print table.keys()
 
 with open(a) as csvfilea:
-    csva = csv.reader(csvfilea)
+    with open(o, 'w') as csvfileo:
+        csva = csv.reader(csvfilea)
+        csvo = csv.writer(csvfileo)
 
-    linestoskip = 7 #number of useless lines
-    for i in xrange(linestoskip):
-        csva.next()
+        #write header row with new headers
+        temp = csva.next()
+        temp.extend(gradeheader)
+        csvo.writerow(temp)
 
-    #now find column indices again
-    temp = csva.next()
-    for i in xrange(len(temp)):
-        if temp[i] == c:
-            idxc = i
-        elif temp[i] == d:
-            idxd = i
+        #write second row without changing
+        csvo.writerow(csva.next())
 
-    #open output file
-    with open(o) as csvfileo:
-        csvo = csv.writer(csvfilea)
+        #append rows
+        for row in csva:
+            print row[2]
+            if row[2] in table:
+                row.extend(table[row[2]])
+                csvo.writerow(row)
+            else:
+                for i in xrange(len(gradeheader)):
+                    row.extend(0)
+                csvo.writerow(row)
+
+
 
 
 
