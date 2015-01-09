@@ -38,19 +38,25 @@ with open(a) as csvfilea:
         csva = csv.reader(csvfilea)
         csvo = csv.writer(csvfileo)
 
+        ## addition: modify the headers
+        gradeheader = ["webwork " + i for i in gradeheader]
+
         #write header row with new headers
         temp = csva.next()
+        temp = temp[:6]
         temp.extend(gradeheader)
         csvo.writerow(temp)
 
         #write second row without changing
         temp = csva.next()
+        temp = temp[:6]
         for i in xrange(len(gradeheader)):
             temp.extend('')
         csvo.writerow(temp)
 
         #append rows
         for row in csva:
+            row = row[:6]
             if row[2] in table:
                 row.extend(table[row[2]])
                 csvo.writerow(row)
